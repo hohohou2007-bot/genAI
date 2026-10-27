@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>치아형태학 학습 도우미</title>
+<style>
+:root{--navy:#20364f;--blue:#3568a8;--pale:#eef4fb;--ink:#243246;--muted:#66758a;--line:#dce4ee;--green:#237a57;--red:#b63d46;--amber:#9a5b00}
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:var(--ink);font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;line-height:1.55}
+header{background:var(--navy);color:white;padding:22px max(18px,calc((100% - 1100px)/2));}
+header h1{margin:0;font-size:clamp(1.3rem,3vw,1.8rem)}header p{margin:5px 0 0;color:#d8e5f4;font-size:.95rem}
+main{max-width:1100px;margin:24px auto;padding:0 16px 48px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab,.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:650;cursor:pointer;transition:.15s}
+.tab{background:#e5ebf3;color:#33465d}.tab.active,.btn.primary{background:var(--blue);color:#fff}.btn{background:#e7edf5;color:#27394e}.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,28px);box-shadow:0 4px 18px #1d35570a}
+h2{font-size:1.25rem;margin:0 0 16px}h3{font-size:1.05rem;margin:0 0 10px}.muted{color:var(--muted)}.small{font-size:.9rem}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.field label{display:block;font-weight:700;margin-bottom:7px}.field select,.field input{width:100%;padding:11px;border:1px solid #cbd6e3;border-radius:9px;font:inherit;background:white;color:var(--ink)}
+.range-list{display:flex;flex-wrap:wrap;gap:9px}.range-list label{display:flex;align-items:center;gap:7px;background:#f4f7fb;border:1px solid var(--line);padding:8px 11px;border-radius:9px;font-weight:500;cursor:pointer}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.summary{background:var(--pale);padding:14px;border-radius:10px;margin-top:16px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:1.45rem}.stat span{font-size:.88rem;color:var(--muted)}
+.progress-wrap{height:8px;background:#e6ebf2;border-radius:20px;overflow:hidden;margin:12px 0 20px}.progress{height:100%;background:var(--blue);width:0%;transition:width .2s}
+.question-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.tag{display:inline-block;background:#eaf1fb;color:#315e96;padding:4px 9px;border-radius:99px;font-size:.83rem;font-weight:700}
+.tooth-art{min-height:150px;display:grid;place-items:center;background:linear-gradient(135deg,#f2f6fb,#e7eef8);border-radius:13px;margin:16px 0;padding:14px;text-align:center}
+.tooth-symbol{font-size:4rem;line-height:1.2}.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{border:1px solid var(--line);border-radius:11px;padding:13px;text-align:left;background:white;color:var(--ink);cursor:pointer;font:inherit}.option:hover{border-color:var(--blue);background:#f7faff}.option.selected{border:2px solid var(--blue);background:var(--pale)}.option.correct{border:2px solid var(--green);background:#effaf4}.option.wrong{border:2px solid var(--red);background:#fff3f3}
+.feedback{margin-top:16px;padding:14px;border-radius:10px}.feedback.good{background:#effaf4;border:1px solid #bce3cc}.feedback.bad{background:#fff4f3;border:1px solid #efc8c8}
+.review-list{display:grid;gap:10px}.review-item{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;justify-content:space-between;gap:12px;align-items:center}.review-item.overdue{border:2px solid #d98228;background:#fff8ed}.review-item h3{margin:0 0 4px}.pill{font-size:.82rem;border-radius:99px;padding:4px 8px;background:#edf1f6;white-space:nowrap}.pill.overdue{background:#ffe4bf;color:#854600;font-weight:800}.empty{padding:24px;text-align:center;background:#f8fafc;border:1px dashed #cbd6e3;border-radius:12px}
+.notice{margin:0 0 16px;padding:12px 14px;border-radius:10px;background:#fff8e8;border:1px solid #f0d59a;color:#744a00}
+footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:22px}
+@media(max-width:650px){main{margin-top:15px;padding:0 11px 32px}.form-grid,.options{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:10px}.stat strong{font-size:1.2rem}.panel{border-radius:13px}.review-item{align-items:flex-start;flex-direction:column}.tooth-art{min-height:125px}}
+</style>
+</head>
+<body>
+<header><h1>🦷 치아형태학 학습 도우미</h1><p>틀린 문제를 확인하고, 반복 학습으로 치아 형태를 익혀 보세요.</p></header>
+<main>
+<nav class="tabs" aria-label="학습 메뉴">
+<button class="tab active" data-view="setup">퀴즈 설정</button>
+<button class="tab" data-view="quiz">퀴즈 풀기</button>
+<button class="tab" data-view="review">오답노트 · 반복학습</button>
+</nav>
+<section id="setup" class="panel view">
+<h2>퀴즈 유형 및 범위 선택</h2>
+<p class="muted">원하는 유형과 치아 범위를 선택하세요. 범위를 고르지 않으면 전체 범위에서 출제됩니다.</p>
+<div class="form-grid">
+<div class="field"><label for="quizType">퀴즈 유형</label><select id="quizType"><option value="all">전체 유형</option><option value="number">치아 번호</option><option value="feature">형태 특징</option><option value="compare">치아 비교</option></select></div>
+<div class="field"><label for="questionCount">문항 수</label><select id="questionCount"><option value="5">5문항</option><option value="10">10문항</option><option value="15">15문항</option><option value="all">전체 문항</option></select></div>
+</div>
+<div class="field" style="margin-top:20px"><label>학습 범위</label>
+<div class="range-list" id="rangeList">
+<label><input type="checkbox" value="incisor"> 절치</label><label><input type="checkbox" value="canine"> 견치</label><label><input type="checkbox" value="premolar"> 소구치</label><label><input type="checkbox" value="molar"> 대구치</label><label><input type="checkbox" value="general"> 기본 용어</label>
+</div></div>
+<div class="summary" id="settingsSummary">현재 설정: 전체 유형 · 전체 범위 · 5문항</div>
+<div class="actions"><button class="btn primary" id="startBtn">이 설정으로 퀴즈 시작</button><button class="btn" id="resetBtn">설정 초기화</button></div>
+<p class="small muted">※ 기본 예시 문항으로 구성되어 있습니다. 실제 수업 자료나 치아 사진을 추가하려면 문항 데이터를 수정하세요.</p>
+</section>
+<section id="quiz" class="panel view" hidden>
+<div id="quizEmpty" class="empty"><h2>아직 시작한 퀴즈가 없어요.</h2><p>먼저 퀴즈 설정 화면에서 유형과 범위를 선택하세요.</p><button class="btn primary" data-goto="setup">퀴즈 설정으로 이동</button></div>
+<div id="quizArea" hidden>
+<div class="question-top"><span class="tag" id="qCategory"></span><span class="muted" id="qCount"></span></div>
+<div class="progress-wrap"><div class="progress" id="progress"></div></div>
+<div class="tooth-art" id="questionImage" role="img" aria-label="치아 형태 참고 그림"><div><div class="tooth-symbol">🦷</div><div class="small muted">개념 확인용 표시 · 실제 치아 사진 아님</div></div></div>
+<h2 id="questionText"></h2>
+<div class="options" id="options"></div>
+<div id="feedback" aria-live="polite"></div>
+<div class="actions"><button class="btn primary" id="submitAnswer">정답 확인</button><button class="btn primary" id="nextQuestion" hidden>다음 문제</button><button class="btn" id="quitQuiz">퀴즈 종료</button></div>
+</div>
+<div id="resultArea" hidden></div>
+</section>
+<section id="review" class="panel view" hidden>
+<h2>오답노트 · 반복학습</h2>
+<div class="stats"><div class="stat"><strong id="wrongTotal">0</strong><span>오답 기록 문항</span></div><div class="stat"><strong id="dueTotal">0</strong><span>복습 예정 항목</span></div><div class="stat"><strong id="masteredTotal">0</strong><span>복습 완료 항목</span></div></div>
+<div id="overdueNotice"></div>
+<div class="actions" style="margin:0 0 16px"><button class="btn" id="reviewAll">오답 문제로 퀴즈 시작</button><button class="btn" id="clearHistory">학습 기록 초기화</button></div>
+<div id="reviewList" class="review-list"></div>
+</section>
+<footer>학습 기록은 이 브라우저의 로컬 저장소에 저장됩니다. 다른 기기·브라우저와 자동 동기화되지 않습니다.</footer>
+</main>
+<script>
+const QUESTIONS = [
+{id:"i1",range:"incisor",type:"number",category:"절치 · 치아 번호",q:"영구치 중 상악 중절치의 FDI 두 자리 표기는 무엇인가요?",options:["11","12","21","22"],answer:0,explain:"FDI 표기에서 상악 우측 중절치는 11, 상악 좌측 중절치는 21입니다."},
+{id:"i2",range:"incisor",type:"feature",category:"절치 · 형태 특징",q:"절치의 대표적인 기능은 무엇인가요?",options:["음식을 자르기","음식을 분쇄하기","음식을 찢기","음식물을 갈아 으깨기"],answer:0,explain:"절치는 앞니로, 절단연을 이용해 음식물을 자르는 데 적합합니다."},
+{id:"i3",range:"incisor",type:"compare",category:"절치 · 치아 비교",q:"일반적으로 상악 중절치와 비교했을 때 상악 측절치의 특징으로 알맞은 것은?",options:["대체로 크기가 작다","항상 치근이 없다","교두가 뚜렷하다","주 기능이 분쇄이다"],answer:0,explain:"상악 측절치는 일반적으로 상악 중절치보다 작으며, 개인차와 변이가 있을 수 있습니다."},
+{id:"c1",range:"canine",type:"number",category:"견치 · 치아 번호",q:"영구치 중 하악 좌측 견치의 FDI 표기는 무엇인가요?",options:["33","43","32","42"],answer:0,explain:"FDI 표기에서 하악 좌측 견치는 33, 하악 우측 견치는 43입니다."},
+{id:"c2",range:"canine",type:"feature",category:"견치 · 형태 특징",q:"견치의 형태와 기능에 대한 설명으로 가장 알맞은 것은?",options:["하나의 뚜렷한 교두가 있다","절단연이 넓고 평평하다","주로 음식물을 분쇄한다","일반적으로 교두가 없다"],answer:0,explain:"견치는 뚜렷한 교두를 가지며 음식물을 찢는 기능에 관여합니다."},
+{id:"c3",range:"canine",type:"compare",category:"견치 · 치아 비교",q:"일반적으로 견치의 치근에 대한 설명으로 알맞은 것은?",options:["긴 치근을 갖는 편이다","치근이 없다","항상 두 개의 치근이다","치근이 치관보다 짧다"],answer:0,explain:"견치는 치열에서 치근이 긴 치아에 속하는 편입니다. 해부학적 변이는 존재합니다."},
+{id:"p1",range:"premolar",type:"number",category:"소구치 · 치아 번호",q:"영구치 중 상악 우측 제1소구치의 FDI 표기는 무엇인가요?",options:["14","15","24","25"],answer:0,explain:"상악 우측 제1소구치는 14, 제2소구치는 15입니다."},
+{id:"p2",range:"premolar",type:"feature",category:"소구치 · 형태 특징",q:"소구치의 일반적인 위치는 어디인가요?",options:["견치와 대구치 사이","중절치와 측절치 사이","마지막 대구치 뒤","치열 바깥쪽"],answer:0,explain:"소구치는 견치 뒤쪽, 대구치 앞쪽에 위치합니다."},
+{id:"p3",range:"premolar",type:"compare",category:"소구치 · 치아 비교",q:"상악 제1소구치에서 비교적 자주 관찰되는 특징은 무엇인가요?",options:["두 개의 교두와 근심면의 발육구가 나타날 수 있다","교두가 전혀 없다","항상 세 개의 치근이다","절단연이 주된 형태이다"],answer:0,explain:"상악 제1소구치는 협측·구개측 교두를 가지며 근심면의 변연융선 부위에 근심 변연구가 관찰될 수 있습니다. 치근 수에는 변이가 있습니다."},
+{id:"m1",range:"molar",type:"number",category:"대구치 · 치아 번호",q:"영구치 중 하악 우측 제1대구치의 FDI 표기는 무엇인가요?",options:["46","36","47","37"],answer:0,explain:"하악 우측 제1대구치는 46, 하악 좌측 제1대구치는 36입니다."},
+{id:"m2",range:"molar",type:"feature",category:"대구치 · 형태 특징",q:"대구치의 주요 기능은 무엇인가요?",options:["음식물을 분쇄하기","음식을 자르기만 하기","음식을 찢기만 하기","발음만 담당하기"],answer:0,explain:"대구치는 넓은 교합면과 교두를 이용해 음식물을 분쇄하는 데 중요한 역할을 합니다."},
+{id:"m3",range:"molar",type:"compare",category:"대구치 · 치아 비교",q:"일반적으로 하악 제1대구치의 교두 수에 대한 설명으로 알맞은 것은?",options:["대개 5개 교두를 갖는다","항상 2개 교두이다","교두가 없다","항상 7개 교두이다"],answer:0,explain:"하악 제1대구치는 전형적으로 5개 교두를 가지지만 형태 변이가 있을 수 있습니다."},
+{id:"g1",range:"general",type:"feature",category:"기본 용어",q:"치아의 입술 쪽 면을 가리키는 용어는 무엇인가요?",options:["순면(labial)","설면(lingual)","근심면(mesial)","원심면(distal)"],answer:0,explain:"순면(labial)은 입술을 향하는 면을 뜻합니다. 앞니에서 주로 사용합니다."},
+{id:"g2",range:"general",type:"feature",category:"기본 용어",q:"치열궁의 정중선에 더 가까운 방향을 뜻하는 용어는 무엇인가요?",options:["근심(mesial)","원심(distal)","협측(buccal)","절단(incisal)"],answer:0,explain:"근심은 치열궁의 정중선에 가까운 방향, 원심은 정중선에서 먼 방향을 뜻합니다."},
+{id:"g3",range:"general",type:"feature",category:"기본 용어",q:"치아의 혀 쪽 면을 가리키는 용어는 무엇인가요?",options:["설면(lingual)","순면(labial)","협면(buccal)","교합면(occlusal)"],answer:0,explain:"설면(lingual)은 혀를 향하는 치아 면을 뜻합니다."}
+];
+const STORAGE_KEY="toothMorphologyStudy_v1";
+let historyData=loadHistory(), quizItems=[], index=0, selected=null, locked=false, correctCount=0, quizMode="normal", userAnswers=[];
+const $=id=>document.getElementById(id);
+function loadHistory(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}catch(e){return {}}}
+function saveHistory(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(historyData))}catch(e){alert("브라우저 저장소에 기록을 저장하지 못했습니다. 브라우저 저장 공간 설정을 확인해 주세요.")}}
+function showView(name){document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!==name);document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===name));if(name==="review")renderReview();window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
+document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.goto)));
+function selectedRanges(){return [...document.querySelectorAll('#rangeList input:checked')].map(x=>x.value)}
+function typeLabel(t){return ({all:"전체 유형",number:"치아 번호",feature:"형태 특징",compare:"치아 비교"})[t]||t}
+function updateSummary(){const ranges=selectedRanges();$("settingsSummary").textContent=`현재 설정: ${typeLabel($("quizType").value)} · ${ranges.length?ranges.map(r=>({"incisor":"절치","canine":"견치","premolar":"소구치","molar":"대구치","general":"기본 용어"})[r]).join(", "):"전체 범위"} · ${$("questionCount").value==="all"?"전체 문항":$("questionCount").value+"문항"}`}
+$("quizType").addEventListener("change",updateSummary);$("questionCount").addEventListener("change",updateSummary);document.querySelectorAll('#rangeList input').forEach(x=>x.addEventListener("change",updateSummary));
+$("resetBtn").addEventListener("click",()=>{$("quizType").value="all";$("questionCount").value="5";document.querySelectorAll('#rangeList input').forEach(x=>x.checked=false);updateSummary()});
+function startQuiz(items,mode="normal"){
+ if(!items.length){alert("선택한 조건에 해당하는 문항이 없습니다. 다른 범위나 유형을 선택해 주세요.");return}
+ quizItems=[...items].sort(()=>Math.random()-.5);index=0;selected=null;locked=false;correctCount=0;quizMode=mode;userAnswers=[];
+ $("quizEmpty").hidden=true;$("quizArea").hidden=false;$("resultArea").hidden=true;showView("quiz");renderQuestion();
+}
+$("startBtn").addEventListener("click",()=>{const ranges=selectedRanges(),type=$("quizType").value;let items=QUESTIONS.filter(q=>(!ranges.length||ranges.includes(q.range))&&(type==="all"||q.type===type));const count=$("questionCount").value==="all"?items.length:Number($("questionCount").value);items=items.slice(0,count);startQuiz(items)});
+function renderQuestion(){
+ const q=quizItems[index];selected=null;locked=false;$("qCategory").textContent=q.category;$("qCount").textContent=`${index+1} / ${quizItems.length}`;$("progress").style.width=`${(index+1)/quizItems.length*100}%`;$("questionText").textContent=q.q;$("feedback").innerHTML="";$("submitAnswer").hidden=false;$("submitAnswer").disabled=false;$("nextQuestion").hidden=true;
+ const opts=$("options");opts.innerHTML="";q.options.forEach((opt,i)=>{const b=document.createElement("button");b.className="option";b.textContent=`${i+1}. ${opt}`;b.addEventListener("click",()=>{if(locked)return;selected=i;opts.querySelectorAll(".option").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")});opts.appendChild(b)});
+}
+$("submitAnswer").addEventListener("click",()=>{
+ if(locked)return;
+ if(selected===null){
+  alert("보기를 하나 선택한 뒤 다음으로 넘어가 주세요.");
+  return;
+ }
+ locked=true;
+ userAnswers[index]=selected;
+ $("feedback").innerHTML='<div class="summary">답변을 저장했어요. 모든 문항을 푼 뒤 마지막에 한꺼번에 채점합니다.</div>';
+ $("submitAnswer").hidden=true;
+ $("nextQuestion").hidden=false;
+ $("nextQuestion").textContent=index===quizItems.length-1?"전체 채점하기":"다음 문제";
+});
+$("nextQuestion").addEventListener("click",()=>{index++;if(index>=quizItems.length){showResult();return}renderQuestion()});
+function showResult(){
+ correctCount=0;
+ const results=[];
+ quizItems.forEach((q,i)=>{
+  const chosen=userAnswers[i];
+  const good=chosen===q.answer;
+  if(good)correctCount++;
+  const rec=historyData[q.id]||{wrongCount:0,correctCount:0,stage:0,nextReview:null,lastResult:null};
+  if(good){
+   rec.correctCount=(rec.correctCount||0)+1;
+   rec.lastResult="correct";
+   rec.stage=Math.min(5,(rec.stage||0)+1);
+   const days=[1,3,7,14,30,60];
+   rec.nextReview=new Date(Date.now()+days[Math.max(0,rec.stage-1)]*86400000).toISOString();
+  }else{
+   rec.wrongCount=(rec.wrongCount||0)+1;
+   rec.lastResult="wrong";
+   rec.stage=0;
+   rec.nextReview=new Date(Date.now()+86400000).toISOString();
+  }
+  rec.lastReviewed=new Date().toISOString();
+  rec.questionId=q.id;
+  rec.question=q.q;
+  rec.answer=q.options[q.answer];
+  rec.category=q.category;
+  historyData[q.id]=rec;
+  results.push({q,chosen,good});
+ });
+ saveHistory();
+ $("quizArea").hidden=true;
+ $("resultArea").hidden=false;
+ const details=results.map((r,i)=>`
+  <div class="review-item" style="display:block;margin-top:10px;border-color:${r.good?"#bce3cc":"#efc8c8"};background:${r.good?"#effaf4":"#fff4f3"}">
+   <strong>${i+1}. ${r.good?"정답":"오답"}</strong>
+   <p>${r.q.q}</p>
+   <p class="small">내가 선택한 답: ${r.chosen===undefined?"미응답":r.q.options[r.chosen]}</p>
+   <p class="small"><strong>정답: ${r.q.options[r.q.answer]}</strong></p>
+   <p class="small">${r.q.explain}</p>
+  </div>`).join("");
+ $("resultArea").innerHTML=`<div><div class="empty"><div class="tooth-symbol">📝</div><h2>전체 채점 결과</h2><p>총 ${quizItems.length}문항 중 <strong>${correctCount}문항</strong> 정답</p><p>정답률: <strong>${Math.round(correctCount/quizItems.length*100)}%</strong></p><p class="muted small">아래에서 문항별 정오답과 해설을 확인할 수 있어요.</p><div class="actions" style="justify-content:center"><button class="btn primary" id="retryBtn">같은 조건으로 다시 풀기</button><button class="btn" id="goReviewBtn">오답노트 확인</button><button class="btn" id="goSetupBtn">설정으로 돌아가기</button></div></div><h2 style="margin-top:22px">문항별 채점</h2>${details}</div>`;
+ $("retryBtn").onclick=()=>startQuiz(quizItems,quizMode);
+ $("goReviewBtn").onclick=()=>showView("review");
+ $("goSetupBtn").onclick=()=>showView("setup");
+}
+
+$("quitQuiz").addEventListener("click",()=>{if(confirm("퀴즈를 종료할까요? 현재 퀴즈의 미응답 문항은 채점되지 않습니다.")){ $("quizArea").hidden=true;$("quizEmpty").hidden=false;$("resultArea").hidden=true;showView("setup")}});
+function dayDiff(date){return Math.floor((Date.now()-new Date(date).getTime())/86400000)}
+function renderReview(){
+ const entries=Object.entries(historyData).map(([id,r])=>({id,...r})).filter(r=>QUESTIONS.some(q=>q.id===r.id));
+ const wrong=entries.filter(r=>(r.wrongCount||0)>0),due=entries.filter(r=>r.nextReview&&new Date(r.nextReview).getTime()<=Date.now()),mastered=entries.filter(r=>(r.stage||0)>=3);
+ $("wrongTotal").textContent=wrong.length;$("dueTotal").textContent=due.length;$("masteredTotal").textContent=mastered.length;
+ const overdue=due.filter(r=>dayDiff(r.nextReview)>=3);$("overdueNotice").innerHTML=overdue.length?`<div class="notice">⚠️ <strong>복습 기한이 3일 이상 지난 항목 ${overdue.length}개</strong>가 있습니다. 먼저 복습해 보세요.</div>`:"";
+ const list=$("reviewList");list.innerHTML="";
+ if(!entries.length){list.innerHTML='<div class="empty">아직 학습 기록이 없습니다.<br>퀴즈를 풀면 틀린 문제와 복습 일정이 여기에 저장됩니다.</div>';return}
+ entries.sort((a,b)=>{const ad=a.nextReview?new Date(a.nextReview).getTime():Infinity,bd=b.nextReview?new Date(b.nextReview).getTime():Infinity;return ad-bd});
+ entries.forEach(r=>{const q=QUESTIONS.find(x=>x.id===r.id),isDue=r.nextReview&&new Date(r.nextReview).getTime()<=Date.now(),late=isDue&&dayDiff(r.nextReview)>=3;const el=document.createElement("div");el.className="review-item"+(late?" overdue":"");const left=document.createElement("div");const h=document.createElement("h3");h.textContent=r.category||q.category;const p=document.createElement("p");p.className="small muted";p.textContent=q.q;const detail=document.createElement("div");detail.className="small";detail.textContent=`오답 ${r.wrongCount||0}회 · 정답 ${r.correctCount||0}회 · 학습 단계 ${r.stage||0}/5`;left.append(h,p,detail);const right=document.createElement("div");const pill=document.createElement("span");pill.className="pill"+(late?" overdue":"");if(!r.nextReview)pill.textContent="복습 일정 없음";else if(isDue)pill.textContent=late?`복습 ${dayDiff(r.nextReview)}일 지연`:"복습 예정";else pill.textContent="복습 예정: "+new Date(r.nextReview).toLocaleDateString("ko-KR");const btn=document.createElement("button");btn.className="btn";btn.style.marginTop="8px";btn.textContent="이 문제 복습";btn.onclick=()=>startQuiz([q],"review");right.append(pill,document.createElement("br"),btn);el.append(left,right);list.appendChild(el)});
+}
+$("reviewAll").addEventListener("click",()=>{const ids=Object.keys(historyData).filter(id=>historyData[id].wrongCount>0);const items=QUESTIONS.filter(q=>ids.includes(q.id));if(!items.length){alert("아직 오답 기록이 없습니다. 먼저 퀴즈를 풀어 보세요.");return}startQuiz(items,"review")});
+$("clearHistory").addEventListener("click",()=>{if(confirm("저장된 오답 및 복습 기록을 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.")){historyData={};saveHistory();renderReview()}});
+updateSummary();renderReview();
+</script>
+</body>
+</html>
